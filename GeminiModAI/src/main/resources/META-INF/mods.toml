@@ -9,7 +9,7 @@ displayName="Gemini Chat Mod"
 description='''
 Un mod qui permet de discuter avec l'IA Gemini directement dans Minecraft via la commande /ia
 '''
-authors="TonPseudo"
+authors="Youssef Nathan Valentinooo"
 
 [[dependencies.geminichat]]
     modId="forge"

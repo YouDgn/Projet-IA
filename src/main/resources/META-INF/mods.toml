@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="geminichat"
+version="1.0.0"
+displayName="Gemini Chat Mod"
+description='''
+Un mod qui permet de discuter avec l'IA Gemini directement dans Minecraft via la commande /ia
+'''
+authors="TonPseudo"
+
+[[dependencies.geminichat]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.4.10,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.geminichat]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"

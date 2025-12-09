@@ -27,8 +27,8 @@ public class GeminiAPI {
      * @return La clé API si trouvée, ou une chaîne vide en cas d'erreur.
      */
     private static String loadApiKey() {
-        // Définit le chemin absolu du fichier gemini_key.txt à l'intérieur du répertoire du jeu.
-        Path keyPath = FMLPaths.GAMEDIR.get().resolve("gemini_key.txt"); 
+        // APRÈS (cherche dans le dossier config/)
+        Path keyPath = FMLPaths.CONFIGDIR.get().resolve("gemini_key.txt");
 
         try {
             if (Files.exists(keyPath)) {

@@ -9,30 +9,28 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-// Imports pour la lecture de fichier sécurisée
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
-// Import spécifique à Forge pour trouver le répertoire du jeu
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public class GeminiAPI {
     
-    // La clé API est chargée au démarrage depuis un fichier, évitant la fuite (leaked).
     private static final String API_KEY = loadApiKey();
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
+    
+    // Prompt système pour définir le comportement de l'IA
+    private static final String SYSTEM_PROMPT = "Tu es Cacaman123, une IA specialisee pour aider les joueurs de Minecraft. " +
+            "Tu dois TOUJOURS repondre sans emojis, sans caracteres speciaux et SANS ACCENTS. " +
+            "Remplace tous les accents par des lettres normales (e au lieu de é/è/ê, a au lieu de à, etc.). " +
+            "Sois concis, direct et utile pour tout ce qui concerne Minecraft. " +
+            "Exemple: 'Voila comment creer une table de craft' au lieu de 'Voilà comment créer une table de craft'.";
 
-    /**
-     * Charge la clé API depuis un fichier texte dans le répertoire du jeu (GAMEDIR).
-     * @return La clé API si trouvée, ou une chaîne vide en cas d'erreur.
-     */
     private static String loadApiKey() {
-        // APRÈS (cherche dans le dossier config/)
         Path keyPath = FMLPaths.CONFIGDIR.get().resolve("gemini_key.txt");
 
         try {
             if (Files.exists(keyPath)) {
-                // Lecture du fichier, suppression des espaces blancs (trim) et retour de la clé.
                 return Files.readString(keyPath, StandardCharsets.UTF_8).trim();
             } else {
                 System.err.println("ERREUR GRAVE: Fichier de clé API manquant. Veuillez créer 'gemini_key.txt' ici : " + keyPath.toAbsolutePath());
@@ -47,7 +45,6 @@ public class GeminiAPI {
 
     public static String sendMessage(String message) throws Exception {
         
-        // Vérification de sécurité avant de tenter l'appel réseau
         if (API_KEY == null || API_KEY.isEmpty()) {
             return "ERREUR : La clé Gemini n'a pas pu être chargée. Vérifiez 'gemini_key.txt' et son contenu.";
         }
@@ -58,17 +55,30 @@ public class GeminiAPI {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        // Construction du JSON pour l'API Gemini
+        // Construction du JSON avec le prompt système
         JsonObject requestBody = new JsonObject();
         JsonArray contents = new JsonArray();
-        JsonObject content = new JsonObject();
-        JsonArray parts = new JsonArray();
-        JsonObject part = new JsonObject();
         
-        part.addProperty("text", message);
-        parts.add(part);
-        content.add("parts", parts);
-        contents.add(content);
+        // Ajout du prompt système
+        JsonObject systemContent = new JsonObject();
+        JsonArray systemParts = new JsonArray();
+        JsonObject systemPart = new JsonObject();
+        systemPart.addProperty("text", SYSTEM_PROMPT);
+        systemParts.add(systemPart);
+        systemContent.add("parts", systemParts);
+        systemContent.addProperty("role", "user");
+        contents.add(systemContent);
+        
+        // Ajout du message utilisateur
+        JsonObject userContent = new JsonObject();
+        JsonArray userParts = new JsonArray();
+        JsonObject userPart = new JsonObject();
+        userPart.addProperty("text", message);
+        userParts.add(userPart);
+        userContent.add("parts", userParts);
+        userContent.addProperty("role", "user");
+        contents.add(userContent);
+        
         requestBody.add("contents", contents);
 
         // Envoi de la requête
@@ -89,7 +99,6 @@ public class GeminiAPI {
             }
             in.close();
 
-            // Parse la réponse JSON
             JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
             
             if (jsonResponse.has("candidates")) {
@@ -104,7 +113,7 @@ public class GeminiAPI {
                 }
             }
             
-            return "Aucune réponse reçue de Gemini.";
+            return "Aucune réponse reçue de Cacaman123.";
             
         } else {
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));

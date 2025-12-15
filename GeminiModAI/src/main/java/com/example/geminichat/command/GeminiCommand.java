@@ -21,7 +21,7 @@ public class GeminiCommand {
         CommandSourceStack source = context.getSource();
         
         // Message de chargement
-        source.sendSuccess(() -> Component.literal("§7[Gemini] Traitement en cours..."), false);
+        source.sendSuccess(() -> Component.literal("§7[Cacaman123] Traitement en cours..."), false);
         
         // Appel asynchrone pour ne pas bloquer le serveur
         new Thread(() -> {
@@ -30,12 +30,12 @@ public class GeminiCommand {
                 
                 // Envoyer la réponse au joueur
                 source.getServer().execute(() -> {
-                    source.sendSuccess(() -> Component.literal("§b[Gemini] §f" + response), false);
+                    source.sendSuccess(() -> Component.literal("§b[Cacaman123] §f" + response), false);
                 });
                 
             } catch (Exception e) {
                 source.getServer().execute(() -> {
-                    source.sendFailure(Component.literal("§c[Gemini] Erreur: " + e.getMessage()));
+                    source.sendFailure(Component.literal("§c[Cacaman123] Erreur: " + e.getMessage()));
                 });
                 e.printStackTrace();
             }

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Specification-Title: geminichat
+Specification-Vendor: geminichat
+Specification-Version: 1
+Implementation-Title: GeminiModAI
+Implementation-Version: 1.0.0
+Implementation-Vendor: geminichat
+

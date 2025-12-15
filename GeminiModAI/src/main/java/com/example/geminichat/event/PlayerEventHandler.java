@@ -15,7 +15,7 @@ public class PlayerEventHandler {
         if (event.getEntity() instanceof ServerPlayer player) {
             // Envoyer le message de bienvenue avec le nom du joueur
             String playerName = player.getName().getString();
-            String welcomeMessage = "§bCoucou " + playerName + ", si t'as besoin d'aide pour Minecraft, n'hesite surtout pas a me parler via la commande /ia";
+            String welcomeMessage = "§bCoucou " + playerName + ", c'est moi Cacaman123 ! Si t'as besoin d'aide pour Minecraft, n'hesite surtout pas a me parler via la commande /ia :)";
             
             player.sendSystemMessage(Component.literal(welcomeMessage));
         }

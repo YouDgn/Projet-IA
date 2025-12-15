@@ -19,12 +19,34 @@ public class GeminiAPI {
     private static final String API_KEY = loadApiKey();
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
     
-    // Prompt système pour définir le comportement de l'IA
+    // Prompt système avec capacité d'exécution de commandes
     private static final String SYSTEM_PROMPT = "Tu es Cacaman123, une IA specialisee pour aider les joueurs de Minecraft. " +
-            "Tu dois TOUJOURS repondre sans emojis, sans caracteres speciaux et SANS ACCENTS. " +
-            "Remplace tous les accents par des lettres normales (e au lieu de é/è/ê, a au lieu de à, etc.). " +
-            "Sois concis, direct et utile pour tout ce qui concerne Minecraft. " +
-            "Exemple: 'Voila comment creer une table de craft' au lieu de 'Voilà comment créer une table de craft'.";
+            "REGLE ABSOLUE: Reponds TOUJOURS sans emojis, sans caracteres speciaux et SANS ACCENTS. " +
+            "Remplace é/è/ê par e, à par a, ç par c, etc. Sois concis et direct.\n\n" +
+            
+            "CAPACITE SPECIALE: Tu peux executer des commandes Minecraft !\n" +
+            "Quand le joueur te demande de faire quelque chose dans le jeu (donner items, effets, teleporter, etc.), " +
+            "tu DOIS inclure la commande Minecraft appropriee entre les balises [CMD] et [/CMD].\n\n" +
+            
+            "EXEMPLES:\n" +
+            "- Joueur: \"Donnes moi 3 diamants\"\n" +
+            "  Reponse: \"Voila tes diamants ! [CMD]give {player} minecraft:diamond 3[/CMD]\"\n\n" +
+            
+            "- Joueur: \"applique moi Force 3\"\n" +
+            "  Reponse: \"Force 3 active ! [CMD]effect give {player} minecraft:strength 999999 2[/CMD]\"\n\n" +
+            
+            "- Joueur: \"donne moi une epee en diamant enchantee\"\n" +
+            "  Reponse: \"Tiens, une epee puissante ! [CMD]give {player} minecraft:diamond_sword{Enchantments:[{id:\"minecraft:sharpness\",lvl:5}]}[/CMD]\"\n\n" +
+            
+            "- Joueur: \"teleporte moi en 0 100 0\"\n" +
+            "  Reponse: \"Teleportation ! [CMD]tp {player} 0 100 0[/CMD]\"\n\n" +
+            
+            "IMPORTANT:\n" +
+            "- Utilise {player} dans les commandes, ca sera remplace automatiquement\n" +
+            "- Pour les effets, utilise des durees longues (999999) pour qu'ils durent\n" +
+            "- Les niveaux d'effet commencent a 0 (Force 1 = level 0, Force 3 = level 2)\n" +
+            "- Tu peux executer plusieurs commandes en mettant plusieurs balises [CMD][/CMD]\n" +
+            "- Reponds en francais mais SANS ACCENTS\n\n";
 
     private static String loadApiKey() {
         Path keyPath = FMLPaths.CONFIGDIR.get().resolve("gemini_key.txt");
@@ -46,7 +68,7 @@ public class GeminiAPI {
     public static String sendMessage(String message) throws Exception {
         
         if (API_KEY == null || API_KEY.isEmpty()) {
-            return "ERREUR : La clé Gemini n'a pas pu être chargée. Vérifiez 'gemini_key.txt' et son contenu.";
+            return "ERREUR : La cle Gemini n'a pas pu etre chargee. Verifiez 'gemini_key.txt' et son contenu.";
         }
         
         URL url = new URL(API_URL);
@@ -55,39 +77,25 @@ public class GeminiAPI {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        // Construction du JSON avec le prompt système
+        // Construction du JSON
         JsonObject requestBody = new JsonObject();
         JsonArray contents = new JsonArray();
         
-        // Ajout du prompt système
-        JsonObject systemContent = new JsonObject();
-        JsonArray systemParts = new JsonArray();
-        JsonObject systemPart = new JsonObject();
-        systemPart.addProperty("text", SYSTEM_PROMPT);
-        systemParts.add(systemPart);
-        systemContent.add("parts", systemParts);
-        systemContent.addProperty("role", "user");
-        contents.add(systemContent);
-        
-        // Ajout du message utilisateur
         JsonObject userContent = new JsonObject();
         JsonArray userParts = new JsonArray();
         JsonObject userPart = new JsonObject();
-        userPart.addProperty("text", message);
+        userPart.addProperty("text", SYSTEM_PROMPT + "Question: " + message);
         userParts.add(userPart);
         userContent.add("parts", userParts);
-        userContent.addProperty("role", "user");
         contents.add(userContent);
         
         requestBody.add("contents", contents);
 
-        // Envoi de la requête
         try (OutputStream os = conn.getOutputStream()) {
             byte[] input = requestBody.toString().getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
-        // Lecture de la réponse
         int responseCode = conn.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -113,8 +121,10 @@ public class GeminiAPI {
                 }
             }
             
-            return "Aucune réponse reçue de Cacaman123.";
+            return "Aucune reponse recue de Cacaman123.";
             
+        } else if (responseCode == 503) {
+            return "Desole, je suis actuellement surcharge. Reessaie dans quelques secondes !";
         } else {
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
             StringBuilder errorResponse = new StringBuilder();
@@ -123,7 +133,7 @@ public class GeminiAPI {
                 errorResponse.append(line);
             }
             errorReader.close();
-            throw new Exception("Erreur API (code " + responseCode + "): " + errorResponse.toString());
+            return "Erreur API (code " + responseCode + "). Reessaie plus tard !";
         }
     }
 }

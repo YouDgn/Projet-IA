@@ -1,12 +1,14 @@
 package com.example.geminichat.command;
 
 import com.example.geminichat.api.GeminiAPI;
+import com.example.geminichat.util.CommandExecutor;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public class GeminiCommand {
     
@@ -20,6 +22,12 @@ public class GeminiCommand {
         String message = StringArgumentType.getString(context, "message");
         CommandSourceStack source = context.getSource();
         
+        // Vérifier que c'est un joueur
+        if (!(source.getEntity() instanceof ServerPlayer player)) {
+            source.sendFailure(Component.literal("§c[Cacaman123] Cette commande doit etre utilisee par un joueur !"));
+            return 0;
+        }
+        
         // Message de chargement
         source.sendSuccess(() -> Component.literal("§7[Cacaman123] Traitement en cours..."), false);
         
@@ -28,9 +36,15 @@ public class GeminiCommand {
             try {
                 String response = GeminiAPI.sendMessage(message);
                 
-                // Envoyer la réponse au joueur
+                // Exécuter les commandes contenues dans la réponse
                 source.getServer().execute(() -> {
-                    source.sendSuccess(() -> Component.literal("§b[Cacaman123] §f" + response), false);
+                    String finalResponse = CommandExecutor.executeCommandsFromResponse(
+                        response, 
+                        player, 
+                        source.getServer()
+                    );
+                    
+                    source.sendSuccess(() -> Component.literal("§b[Cacaman123] §f" + finalResponse), false);
                 });
                 
             } catch (Exception e) {

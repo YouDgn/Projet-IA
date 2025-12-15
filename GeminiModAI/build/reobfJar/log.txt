@@ -151,4 +151,6 @@ Writing Output: C:\groupe07-main\Projet-IA\GeminiModAI\build\reobfJar\output.jar
   com/example/geminichat/command/GeminiCommand.class
   com/example/geminichat/event/
   com/example/geminichat/event/PlayerEventHandler.class
+  com/example/geminichat/util/
+  com/example/geminichat/util/CommandExecutor.class
   pack.mcmeta

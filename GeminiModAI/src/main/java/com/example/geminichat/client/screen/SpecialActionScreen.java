@@ -13,8 +13,9 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class SpecialActionScreen extends AbstractContainerScreen<CacamanMenu> {
     
+    // Correction du warning ResourceLocation
     private static final ResourceLocation TEXTURE = 
-        new ResourceLocation("geminichat", "textures/gui/cacaman_gui.png");
+        new ResourceLocation("geminichat:textures/gui/cacaman_gui.png");
     
     public SpecialActionScreen(CacamanMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -89,7 +90,9 @@ public class SpecialActionScreen extends AbstractContainerScreen<CacamanMenu> {
     
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        // Correction ici : Retrait des arguments superflus
+        this.renderBackground(graphics); 
+        
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
         

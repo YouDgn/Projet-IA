@@ -121,15 +121,17 @@ public class CacamanScreen extends AbstractContainerScreen<CacamanMenu> {
     }
     
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
-        super.render(graphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(graphics, mouseX, mouseY);
-        
-        // Titre
-        graphics.drawString(this.font, "Cacaman123 - Assistant IA", 
-            this.leftPos + 8, this.topPos + 6, 0x404040, false);
-    }
+public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    // Correction ici : on retire mouseX, mouseY et partialTick
+    this.renderBackground(graphics); 
+    
+    super.render(graphics, mouseX, mouseY, partialTick);
+    this.renderTooltip(graphics, mouseX, mouseY);
+    
+    // Titre
+    graphics.drawString(this.font, "Cacaman123 - Assistant IA", 
+        this.leftPos + 8, this.topPos + 6, 0x404040, false);
+}
     
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
